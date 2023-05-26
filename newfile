@@ -1,1 +1,516 @@
-new
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <ctype.h>
+#include <stdlib.h>
+#define MAX 100
+#define SIZE 20
+struct student {
+    char number[SIZE];
+    char name[SIZE];
+    float chinese;
+    float math;
+    bool exist;
+}; 
+void add(struct student * pr);
+void search(const struct student * ps);
+void single(const struct student * pt);
+void all(const struct student * pa);
+void delete(struct student * pd);
+void change(struct student * pc);
+void sort(struct student * po);
+void savef(const struct student * pv);
+char * s_gets(char * st, int n);
+
+int count = 0;
+int del = 0;
+bool sav = false;
+
+int main(void)
+{
+    struct student students[MAX];
+
+    for (int i = 0; i < MAX; i++)
+       students[i].exist = false;
+    for (int i = 0; i < 80; i++)
+    printf("*");
+    printf("\n");
+    printf("This program can add, delete, change, search and sort datas that you want.\n");
+    printf("After that, please don't forget to save it in one or more files.\n");
+    printf("if you want to stop, please enter [q] to stop.\n");
+    printf("Here is the menu which include available options:\n");
+    printf("\nEnter the options that you want:\n");
+    printf("a. add             b. delete\n");
+    printf("c. change          d. search\n");
+    printf("e. sort            f. save in file\n");
+    
+    char ch;
+    while ((ch = getchar()) != 'q')
+    {   
+        if (ch == '\n')
+        {
+        printf("Please don't [enter] only!\n");
+        printf("\nEnter the options that you want:\n");
+        printf("a. add             b. delete\n");
+        printf("c. change          d. search\n");
+        printf("e. sort            f. save in file\n");
+        continue;
+        }
+
+        else 
+        while (getchar() != '\n')
+            continue;
+
+        switch(ch)
+        {
+            case 'a': {
+                        if (count < MAX)
+                        add(students);
+                        else
+                        printf("Add program end, because the count is up to limit!\n");
+                    }
+            break; 
+            case 'b': {
+                        bool empty = true;
+                        for (int i = 0; i < MAX; i++)
+                        {
+                             if (students[i].exist)
+                             empty = false;
+                        }
+                        if (empty)
+                        printf("error: the data is empty! nothing can be delete.\n");
+                        else
+                        delete(students);
+                    }  
+            break;
+            case 'c': change(students);
+            break;
+            case 'd': search(students);
+            break;
+            case 'e': sort(students);
+            break;
+            case 'f': savef(students);
+            break;
+            default:
+            printf("error:No such options! please try again.\n");
+        }
+        printf("\n Enter the options that you want:\n");
+        printf("a. add             b. delete\n");
+        printf("c. change          d. search\n");
+        printf("e. sort            f. save in file\n");
+        
+    }
+    while (getchar() != '\n')
+              continue;
+    if (!sav)
+    {
+        char ch;
+        printf("You seem to forget saving data into file, so do you really not want to save it?\n");
+        printf("Choose 'Y' to confirm or 'N' to save:\n");
+        while (((ch = getchar()) != 'N') && (ch != 'Y'))
+        {
+            if (ch == '\n')
+            {
+                printf("Please don't [Enter] only!\n");
+                continue;
+            }
+            printf("Enter 'Y' or 'N' please!\n");
+            while (getchar() != '\n')
+               continue;
+        }
+           
+        if(ch == 'N')
+        {
+           while (getchar() != '\n')
+              continue;
+           savef(students);
+        }   
+    } 
+    printf("Done!\n");
+
+    return 0;
+}
+
+void add(struct student * pr)
+{ 
+    int k;
+    for (int i = 0; i < MAX; i++)
+    {
+        if (!pr[i].exist)
+        {
+            k = i;
+            break;
+        }
+    }
+    printf("Add program starts, the begining count: students[%d]\n", k);
+    printf("If you want to stop, please [enter] at the \"name\" line; " "if you want to quit this record, " 
+          "please enter [q] at other line.\n");
+    printf("Please enter the name:\n");
+
+    while (count < MAX && s_gets(pr[k].name, SIZE) != NULL && pr[k].name[0] != '\0' )
+    {
+        printf("Please enter the number:\n");
+         if (s_gets(pr[k].number, SIZE) != NULL && pr[k].number[0] == 'q')
+            break;
+
+        printf("Please enter the chinese score:\n");
+         if ((scanf("%f", &pr[k].chinese)) != 1)
+         {
+            while (getchar() != '\n')
+               continue;
+            break;
+         }
+      
+        printf("Please enter the math score:\n");
+         if ((scanf("%f", &pr[k].math)) != 1)
+         {
+            while (getchar() != '\n')
+               continue;
+            break;            
+         }
+
+        while (getchar() != '\n')
+          continue;
+        pr[k].exist = true;
+        count++;
+        if (count == MAX)
+        break;
+        printf("Please enter the name\n");
+        for (int i = 0; i < MAX; i++)
+        {
+            if (!pr[i].exist)
+            {
+               k = i;
+               break;
+            }
+        }
+    }
+    if (count < MAX)
+       printf("Add program end.\n");                
+    else
+       printf("Add program end, because the count is up to limit!\n");
+}
+
+void delete(struct student * pd)
+{
+    char arr[SIZE];
+    printf("Delete program starts.\n");
+    printf("If you want to stop, please [enter] at the start of a line\n");
+    printf("Please enter the number:\n");
+    while (s_gets(arr, SIZE) != NULL && arr[0] != '\0' && count > 0)
+    {
+        int re;
+        int i;
+        bool indata = false;
+        for (i = 0; i <= count + del; i++)
+        {        
+            if ((re = strcmp(arr, pd[i].number)) == 0 && pd[i].exist)
+            {                
+                pd[i].exist = false;
+                indata = true;
+                count--;
+                del++;
+            }
+            else
+            continue;
+        }
+        if (!indata)
+        printf("error:No such student! please try again.\n");
+        if (count == 0)
+        { 
+            printf("All data has been deleted, ");
+            break;
+        }
+      printf("Please enter next number:\n");
+    }
+    printf("Delete program ends.\n");
+}
+
+void search(const struct student * ps)
+{
+    char ch;
+    printf("Search program starts.\n");
+    printf("If you want to stop, please [enter] at the start of a line\n");
+    printf("please choice the options:\n");
+    printf("a. search single     b. search all\n");
+    
+    while (scanf("%c", &ch) == 1 && ch != '\n')
+    {
+       
+        while (getchar() != '\n')
+           continue;
+
+        switch(ch)
+        {
+          case 'a': single(ps);
+          break;
+          case 'b': all(ps);
+          break;
+          default: printf("error:No such options! please try again.\n");
+          break;
+        }
+        printf("please choice the options:\n");
+        printf("a. search single     b. search all\n");
+    }
+    printf("Search program ends.\n");
+}
+
+void single(const struct student * pt)
+{
+    char arr[SIZE];
+    printf("Single program starts,");
+    printf("If you want to stop, please [enter] at the start of a line\n");
+    printf("Please enter the school number of this student:\n");
+
+    while (s_gets(arr, SIZE) != NULL && arr[0] != '\0')
+    {
+        int re;
+        int i;
+        bool indata = false;
+        for (i = 0; i < count + del; i++)
+        {
+            if ((re = strcmp(arr, pt[i].number)) == 0 && pt[i].exist)
+            {
+                printf("name: %s\nnumber: %s\nchinese: %.1f\nmath: %.1f\n", pt[i].name, 
+                pt[i].number, pt[i].chinese, pt[i].math);
+                indata = true;
+            }
+            else
+            continue;
+        }
+        if (!indata)
+        printf("error:No such student! please try again.\n");
+    printf("Please enter next number:\n");
+    }
+}
+
+void all(const struct student * pa)
+{
+
+    printf("All program starts.\n");
+    if (count == 0)
+    printf("error: The data is empty!\n");
+    else
+    {
+        printf("%s %15s %15s %15s\n", "name", "number", "chinese", "math");
+        for (int i = 0; i < count + del; i++)
+        {
+            if (pa[i].exist)
+            printf("%s %*s %15.1f %16.1f\n", pa[i].name, (18 - strlen(pa[i].name)), 
+           pa[i].number, pa[i].chinese, pa[i].math);
+        }
+    }      
+}
+
+void change(struct student * pc)
+{
+    char arr[SIZE];
+    printf("Change program starts.\n");
+    printf("If you want to stop, please [enter] at the start of a line\n");
+    printf("Please enter the school number of this student:\n");
+    while (s_gets(arr, SIZE) != NULL && arr[0] != '\0')
+    {
+        int re;
+        int i;
+        bool indata = false;
+        for (i = 0; i < count + del; i++)
+        {
+            if ((re = strcmp(arr, pc[i].number)) == 0 && pc[i].exist)
+            {
+                indata = true;
+                char ch;
+                printf("which data do you want to change about this student?\n");
+                printf("a. name     b. number\n");
+                printf("c. chinese  d. math\n");
+                while (scanf("%c", &ch) == 1 && ch !='\n')
+                {
+                    while (getchar() != '\n')
+                       continue;
+                    switch (ch)
+                    {
+                        case 'a': {
+                            printf("Please enter the new name:\n");
+                            s_gets(pc[i].name, SIZE);
+                        break;
+                        } 
+                        
+                        case 'b': {    
+                            printf("Please enter the new number:\n");
+                            s_gets(pc[i].number, SIZE);
+                        break;
+                        }       
+                        
+                        case 'c': {
+                            printf("Please enter the new score of chinese:\n");
+                            scanf("%f", &pc[i].chinese);
+                            while (getchar() != '\n')
+                              continue;
+                           
+                        } 
+                        break;
+                        case 'd': {
+                             printf("Please enter the new score of math:\n");
+                             scanf("%f", &pc[i].math);
+                             while (getchar() != '\n')
+                               continue;
+                        }
+                        break;
+                        default: printf("error: No such options! please try again!\n");
+                        break;
+                    }
+                    printf("Next data that you want to change\n");
+                    printf("a. name     b. number\n");
+                    printf("c. chinese  d. math\n");
+                }
+                printf("End to this change, please enter next number.\n");
+            }
+            else
+            continue;
+        }
+        if (!indata)
+        printf("error: No such student! please try again.\n");
+    }
+    printf("Change program ends.\n");
+}
+
+void sort(struct student * po)
+{
+    char ch;
+    printf("Sort program start.\n");
+    printf("If you want to stop, please [enter] at the start of a line\n");
+    printf("Please choice the option:\n");
+    printf("a. chinese       b. math\n");
+    printf("c. total score   d. number\n");
+    while ((scanf("%c", &ch)) == 1 && ch != '\n')
+    {
+        while (getchar() != '\n')
+           continue;
+        
+        switch(ch)
+        {
+            case 'a':
+            {
+                struct student stu;
+                int n1, n2;
+                for (n1 = 0; n1 < count + del - 1; n1++)
+                {
+                    for (n2 = n1 + 1; n2 < count + del; n2++)
+                       if (po[n1].chinese < po[n2].chinese && po[n1].exist && po[n2].exist)
+                       {
+                            stu = po[n1];
+                            po[n1] = po[n2];
+                            po[n2] = stu;
+                       }
+                }
+            }
+            break;
+            case 'b':
+            {
+                struct student stu;
+                int n1, n2;
+                for (n1 = 0; n1 < count + del - 1; n1++)
+                {
+                    for (n2 = n1 + 1; n2 < count + del; n2++)
+                       if (po[n1].math < po[n2].math && po[n1].exist && po[n2].exist)
+                       {     
+                            stu = po[n1];
+                            po[n1] = po[n2];
+                            po[n2] = stu;
+                       }
+                }
+            }
+            break;
+            case 'c':
+            {
+                struct student stu;
+                int n1, n2;
+                for (n1 = 0; n1 < count + del -1; n1++)
+                {
+                    for (n2 = n1 + 1; n2 < count + del; n2++)
+                       if ((po[n1].math + po[n1].chinese) < (po[n2].math + po[n2].chinese) && po[n1].exist && po[n2].exist)
+                       {    
+                            stu = po[n1];
+                            po[n1] = po[n2];
+                            po[n2] = stu;
+                       }
+                }
+            }
+            break;
+            case 'd':
+            {
+                struct student stu;
+                int n1, n2;
+                for (n1 = 0; n1 < count + del - 1; n1++)
+                {
+                   for (n2 = n1 + 1; n2 < count + del; n2++)
+                      if (atoi(po[n1].number) > atoi(po[n2].number) && po[n1].exist && po[n2].exist)
+                      {
+                           stu = po[n1];
+                           po[n1] = po[n2];
+                           po[n2] = stu;                      
+                      }
+                }   
+            }
+            break;
+            default: printf("error: No such options! please try again!\n");
+            break;
+        }
+        printf("Sort program end.\n");
+        all(po);
+        printf("Please choice next option:\n");
+        printf("a. chinese       b. math\n");
+        printf("c. total score   d. number\n");
+    }
+    printf("Sort program ends.\n");
+}
+
+void savef(const struct student * pv)
+{
+    FILE * fp;
+    char arr[SIZE];
+    char ch;
+    int i;
+    int i2 = 0;
+    printf("savef program starts.\n");
+    printf("If you want to stop, please [enter] at the start of a line\n");
+    printf("Please enter the file name:\n");
+    while (s_gets(arr, SIZE) != NULL && arr[0] != '\0')
+    {
+        if ((fp = fopen(arr, "w")) == NULL)
+        {
+            fprintf(stderr,"error:Can't create output file! please try again.\n");
+            continue;
+        }
+        for (i = 0; i <= count + del; i++)
+        {
+            sav = true;
+ 
+            if (pv[i].exist)
+            fprintf(fp, "%s %*s %15.1f %16.1f\n", pv[i].name, (18 - strlen(pv[i].name)), 
+           pv[i].number, pv[i].chinese, pv[i].math);
+        }
+        fclose(fp);
+        i2++;
+        printf("Please enter next file name:(if you want to save it in only %d file, please" 
+        "[enter] at the start of a line\n", i2);
+    }
+}
+
+char * s_gets(char * st, int n)
+{
+    char * ret_val;
+    char * find;
+    
+    ret_val = fgets(st, n, stdin);
+    if (ret_val)
+    {
+        find = strchr(st, '\n');   
+        if (find)                  
+            *find = '\0';          
+        else
+            while (getchar() != '\n')
+                continue;          
+    }
+    return ret_val;
+}
+
